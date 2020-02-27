@@ -33,7 +33,7 @@ public final class Constants {
 
     public static double DIST_PER_PULSE = ((WHEEL_DIAM*Math.PI)/ENCODER_PPR)*1.14;
     public static double MDIST_PER_PULSE = Units.inchesToMeters(DIST_PER_PULSE);
-    public static double DIST_ADJUSTMENT = 3.55; //This might need to be tweeked for new robot
+    public static double DIST_ADJUSTMENT = 10.5;//7.1;//3.55; //This might need to be tweeked for new robot
 
     //Need to adjust Track Width for the new robot, 19.25" ?
     //public static double TRACK_WIDTH = 23.0; //inches Practice Bot

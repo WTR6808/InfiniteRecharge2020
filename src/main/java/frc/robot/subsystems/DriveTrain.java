@@ -152,6 +152,12 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Right Wheel Speed",wheelSpeeds.rightMetersPerSecond);
     SmartDashboard.putNumber("Speed",speed);
     SmartDashboard.putNumber("Rotation",rotation);
+    //Uncomment if we want to see Left and Right Encoder values for testing and tuning
+    SmartDashboard.putNumber("Left Encoder  ", leftEncoder.getRaw());
+    SmartDashboard.putNumber("Right Encoder ", rightEncoder.getRaw());
+    SmartDashboard.putNumber("Right Distance", getRightDistance());
+    SmartDashboard.putNumber("Left Distance ", getLeftDistance());
+    SmartDashboard.putNumber("Avg Distance  ", getAverageDistance());
 
     //Comment out left and right Master output setting for testing and uncomment
     //  TeleopArcadeDrive so all parameters can be viewed and signs determined

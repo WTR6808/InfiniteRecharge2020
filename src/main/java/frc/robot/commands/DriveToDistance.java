@@ -16,7 +16,7 @@ public class DriveToDistance extends CommandBase {
   /**
    * Creates a new DriveToDistance.
    */
-  private final static double DISTANCE_TOLERANCE = 0.2;
+  private final static double DISTANCE_TOLERANCE = 0.05;
   private final DriveTrain m_drivetrain;
   private final double m_speed;
   private final double m_distance;
@@ -48,8 +48,8 @@ public class DriveToDistance extends CommandBase {
   @Override
   public void execute() {
     //Wait 5 cycles to make sure encoders have reset
-    if (++timeDelay>5) m_drivetrain.TeleopArcadeDrive(m_speed, 0.0);
-    //m_drivetrain.TeleopKinematicDrive(m_speed, 0.0);
+    //if (++timeDelay>5) m_drivetrain.TeleopArcadeDrive(m_speed, 0.0);
+    if (++timeDelay>5) m_drivetrain.TeleopKinematicDrive(Math.signum(m_targetdistance)*(m_speed+0.2), 0.0);
   }
 
   // Called once the command ends or is interrupted.
@@ -63,6 +63,8 @@ public class DriveToDistance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (m_targetdistance - m_drivetrain.getAverageDistance() < DISTANCE_TOLERANCE);
+    //For Arcade Drive multiply this by -1;
+    double avgDist = m_drivetrain.getAverageDistance();
+    return (Math.abs(m_targetdistance - avgDist) < DISTANCE_TOLERANCE);
   }
 }

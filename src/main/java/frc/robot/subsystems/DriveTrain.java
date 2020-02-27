@@ -207,6 +207,11 @@ public class DriveTrain extends SubsystemBase {
     else setVisionNode();
   }
 
+  //Toggle Limelight Taking Snapshots
+  public void toggleTakeSnapShots(){
+    limeLight.toggleSnapShot();
+  }
+
   //Uses LimeLight Tracking Data to Drive to Target in Arcade Mode
     public boolean visionDriveArcade(){
     if (limeLight.calcDoubleS()){

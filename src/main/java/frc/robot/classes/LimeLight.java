@@ -42,6 +42,7 @@ public class LimeLight {
 
     private double driveCommand = 0.0;
     private double steerCommand = 0.0;
+    private boolean takeSnapShots = false;
 
     private static final double STEER_K           =  0.037;
     private static final double DRIVE_K           =  0.048;//0.01;
@@ -77,6 +78,11 @@ public class LimeLight {
       return tv.getDouble(0)%2 != 0;
     }
   
+    public void toggleSnapShot(){
+      takeSnapShots = !takeSnapShots;
+      table.getEntry("snapshot").setNumber(takeSnapShots?1:0);
+    }
+    
     public void setLEDOn(boolean on){
       table.getEntry("ledMode").setNumber(on?3:1);
     }

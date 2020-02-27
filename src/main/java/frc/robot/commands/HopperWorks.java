@@ -7,51 +7,49 @@
 
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Hopper;
 
-public class ArcadeDrive extends CommandBase {
+public class HopperWorks extends CommandBase {
   /**
-   * Creates a new ArcadeDrive.
-   *
+   * Creates a new HopperWorks.
    */
-   private final DriveTrain m_DriveTrain;
-   private final DoubleSupplier speed;
-   private final DoubleSupplier rotation;
+  private final Hopper m_Hopper;
   
-  public ArcadeDrive(DoubleSupplier Y, DoubleSupplier X, DriveTrain drivetrain) {
+  public HopperWorks(Hopper hopper) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_DriveTrain = drivetrain;
-    speed = Y;
-    rotation = X;
-    addRequirements(m_DriveTrain);
+    m_Hopper = hopper;
+    
+    addRequirements(m_Hopper);
+
+
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_Hopper.turnON_OFF();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
+  // Placing turnONOFF() call here will cause the hopper to toggle between on and off
+  //   every other cycle.  Move this call to Initialize so it is only called once.
   @Override
   public void execute() {
-                                  //make forward positive    
-    m_DriveTrain.TeleopArcadeDrive(-speed.getAsDouble(), rotation.getAsDouble());
-
-
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_DriveTrain.Stop();
   }
 
   // Returns true when the command should end.
+  // Command will never end, this should only be used for a default command.
+  //   Since this command is a toggle, it only needs to run once and then complete
+  //   return true instead.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

@@ -7,51 +7,40 @@
 
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
-public class ArcadeDrive extends CommandBase {
+public class Darkness extends CommandBase {
   /**
-   * Creates a new ArcadeDrive.
-   *
+   * Creates a new Darkness.
    */
-   private final DriveTrain m_DriveTrain;
-   private final DoubleSupplier speed;
-   private final DoubleSupplier rotation;
-  
-  public ArcadeDrive(DoubleSupplier Y, DoubleSupplier X, DriveTrain drivetrain) {
+  private final DriveTrain m_driveTrain;
+  public Darkness(DriveTrain driveTrain) {
+    m_driveTrain = driveTrain;
+    addRequirements(driveTrain);
     // Use addRequirements() here to declare subsystem dependencies.
-    m_DriveTrain = drivetrain;
-    speed = Y;
-    rotation = X;
-    addRequirements(m_DriveTrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_driveTrain.toggleLimeLightMode();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-                                  //make forward positive    
-    m_DriveTrain.TeleopArcadeDrive(-speed.getAsDouble(), rotation.getAsDouble());
-
-
+    //m_driveTrain.setVisionNode();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_DriveTrain.Stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

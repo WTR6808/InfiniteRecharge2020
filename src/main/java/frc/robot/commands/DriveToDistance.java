@@ -7,6 +7,7 @@
 
 package frc.robot.commands;
 
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
@@ -20,39 +21,42 @@ public class DriveToDistance extends CommandBase {
   private final double m_speed;
   private final double m_distance;
   private double m_targetdistance;
+  private int timeDelay = 0;
 
   public DriveToDistance(double speed, double distance, DriveTrain driveTrain) {
     m_speed = speed;
     m_distance = distance;
     m_drivetrain = driveTrain;
     addRequirements(m_drivetrain);
-    m_targetdistance = m_drivetrain.getAverageDistance()+distance;
+    //m_targetdistance = m_drivetrain.getAverageDistance()+distance;
 
-    SmartDashboard.putNumber("target distance",  m_targetdistance);
-    SmartDashboard.putNumber("distance", m_distance);
-}
+    //SmartDashboard.putNumber("target distance",  m_targetdistance);
+    //SmartDashboard.putNumber("distance", m_distance);
+  }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //m_drivetrain.resetDistance();
+    timeDelay = 0;
     m_drivetrain.Stop();
-    m_targetdistance = m_drivetrain.getAverageDistance()+m_distance;  
-      
+    m_drivetrain.resetDistance();
+    m_targetdistance = m_distance;
+    SmartDashboard.putNumber("target distance", m_targetdistance);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //m_drivetrain.TeleopArcadeDrive(m_speed, -(m_drivetrain.getLeftDistance()-m_drivetrain.getRightDistance()*0.05));//0.0);
-    m_drivetrain.TeleopKinematicDrive(m_speed, 0.0);
+    //Wait 5 cycles to make sure encoders have reset
+    if (++timeDelay>5) m_drivetrain.TeleopArcadeDrive(m_speed, 0.0);
+    //m_drivetrain.TeleopKinematicDrive(m_speed, 0.0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    //m_drivetrain.Stop();
-    m_drivetrain.TeleopArcadeDrive(0.0, 0.0);
+    m_drivetrain.Stop();
+    //m_drivetrain.TeleopArcadeDrive(0.0, 0.0);
   }
   
 

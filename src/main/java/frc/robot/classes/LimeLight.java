@@ -45,12 +45,12 @@ public class LimeLight {
 
     private static final double STEER_K           =  0.037;
     private static final double DRIVE_K           =  0.048;//0.01;
-    private static final double DESIRED_TA        = 19.5;
-    private static final double MAX_DRIVE         =  0.75;
-	  private static final double MIN_DRIVE         =  0.40;
-	  private static final double MIN_STEER         =  0.30;
-	  private static final double MIN_STEER_STOPPED =  0.45;
-    private static final double TA_TOLERANCE      =  0.1;
+    //private static final double DESIRED_TA        = 19.5;
+    private static final double MAX_DRIVE         =  0.85; //0.75 PracticeBot
+	  private static final double MIN_DRIVE         =  0.50; //0.40 PracticeBot
+	  private static final double MIN_STEER         =  0.30; //0.30 PracticeBot
+	  private static final double MIN_STEER_STOPPED =  0.45; //0.45 PracticeBot
+    //private static final double TA_TOLERANCE      =  0.1;
     private static final double STEER_CORRECT     =  0.0; //-0.2;
 
     public double getSteerCommand(){
@@ -91,8 +91,8 @@ public class LimeLight {
       //leftSpeed  = 0.2;
       //rightSpeed = 0.2;
       
-	  //Reset the no target counter
-	  targetFailureCount = 0;
+	    //Reset the no target counter
+	    targetFailureCount = 0;
     }
   
     public double getLeftSpeed(){

@@ -26,7 +26,7 @@ public class KinematicDrive extends CommandBase {
    public static double MAX_SPEED(String name, double max_SPEED) {
      double maximum_Speed = SmartDashboard.getNumber("Max Speed", max_SPEED);
   
-     SmartDashboard.putNumber("Max Speed", maximum_Speed);
+//     SmartDashboard.putNumber("Max Speed", maximum_Speed);
      return maximum_Speed;
    }
 

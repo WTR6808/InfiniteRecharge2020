@@ -7,23 +7,29 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.Hopper;
+import frc.robot.subsystems.Shooter;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
-public class ChangeFront extends InstantCommand {
-  private final DriveTrain m_driveTrain;
-  public ChangeFront(DriveTrain driveTrain) {
-    m_driveTrain = driveTrain;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_driveTrain);
-  }
+public class ManualShooter extends SequentialCommandGroup {
+  /**
+   * Creates a new ManualShooter.
+   */
+  Hopper m_hopper;
+  Shooter m_shooter;
+  public ManualShooter(Hopper hopper,
+                       Shooter shooter
+  ) {
+    // Add your commands in the super() call, e.g.
+    // super(new FooCommand(), new BarCommand());
+    super(sequence(new FullPowerShooter(1.0,shooter),
+                   new WaitCommand(0.5),
+                   new HopperWorks(hopper)
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    m_driveTrain.changeFront();
+    ));
   }
 }

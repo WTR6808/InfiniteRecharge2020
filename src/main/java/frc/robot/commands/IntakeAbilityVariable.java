@@ -7,47 +7,46 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Intake;
 
-public class VisionDriveToTarget extends CommandBase {
-  private final DriveTrain m_driveTrain;
-  private boolean noTarget;
-
+public class IntakeAbilityVariable extends CommandBase {
+  private final Intake m_intake;
+  private final DoubleSupplier m_power;
   /**
-   * Creates a new VisionDriveToTarget.
+   * Creates a new IntakeAbilityVariable.
    */
-  public VisionDriveToTarget(DriveTrain driveTrain) {
-    m_driveTrain = driveTrain;
+  public IntakeAbilityVariable(DoubleSupplier power, Intake intake) {
+    m_intake = intake;
+    m_power = power;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_driveTrain);
+    addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    noTarget=false;
-    m_driveTrain.setVisionNode();
-    m_driveTrain.Stop();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //noTarget = !m_driveTrain.visionDriveArcade(); //returns true if target found
-    noTarget = !m_driveTrain.visionDriveKinematic(); //returns true if target found
+    //Only execute command if intake has not been toggled on
+    //if (m_intake.isOff()){
+      m_intake.setSpeed(-m_power.getAsDouble()/1.5); //Divide by two to limit from 0 to 0.5
+    //}
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_driveTrain.setDriverMode();
-    m_driveTrain.Stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return noTarget || m_driveTrain.atTargetArcade();
+    return false;
   }
 }

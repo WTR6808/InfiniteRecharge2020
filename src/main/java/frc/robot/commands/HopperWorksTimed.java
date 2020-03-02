@@ -8,46 +8,42 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.Hopper;
 
-public class VisionDriveToTarget extends CommandBase {
-  private final DriveTrain m_driveTrain;
-  private boolean noTarget;
-
+public class HopperWorksTimed extends CommandBase {
+  private final Hopper m_hopper;
+  private WaitCommand executionTime;
   /**
-   * Creates a new VisionDriveToTarget.
+   * Creates a new HopperWorksTimed.
    */
-  public VisionDriveToTarget(DriveTrain driveTrain) {
-    m_driveTrain = driveTrain;
+  public HopperWorksTimed(Hopper hopper) {
+    m_hopper = hopper;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_driveTrain);
+    addRequirements(m_hopper);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    noTarget=false;
-    m_driveTrain.setVisionNode();
-    m_driveTrain.Stop();
+    executionTime = new WaitCommand(1.0);
+    m_hopper.turnON_OFF();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //noTarget = !m_driveTrain.visionDriveArcade(); //returns true if target found
-    noTarget = !m_driveTrain.visionDriveKinematic(); //returns true if target found
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_driveTrain.setDriverMode();
-    m_driveTrain.Stop();
+    m_hopper.turnON_OFF();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return noTarget || m_driveTrain.atTargetArcade();
+    return executionTime.isFinished();
   }
 }

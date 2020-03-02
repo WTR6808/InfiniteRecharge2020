@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,12 +23,13 @@ public class Intake extends SubsystemBase {
   public Intake() {
     intakeMotor.configFactoryDefault();
     //Do we need to set Inverted?
+    intakeMotor.setNeutralMode(NeutralMode.Brake);
   }
 
   public void turnOff_ON(){
     on = !on;
     if(on){
-      intakeMotor.set(-0.50);
+      intakeMotor.set(Constants.INTAKE_SPEED);
     }
     else{
       intakeMotor.set(0);
@@ -36,7 +38,15 @@ public class Intake extends SubsystemBase {
 
   public void unJam(){
     on = true;
-    intakeMotor.set(0.60);
+    intakeMotor.set(Constants.intake_reverse);
+  }
+
+  public void setSpeed(double speed){
+    intakeMotor.set(speed);
+  }
+
+  public boolean isOff(){
+    return !on;
   }
 
   @Override

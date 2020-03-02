@@ -27,12 +27,11 @@ public class Autonomous1 extends SequentialCommandGroup {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super(
-      sequence( new DriveToDistance(-0.8, 2.5, driveTrain),
+      sequence( new DriveToDistance(2.0, 1.25, driveTrain), //Speed was 0.8
                 new TurningAngle(90, driveTrain),
-                new DriveToDistance(-0.8, Units.inchesToMeters(-77), driveTrain),
+                new DriveToDistance(2.0, Units.inchesToMeters(77), driveTrain),//-77
                 new TurningAngle(90, driveTrain),
-                new VisionDriveToTarget(driveTrain),
-                new AutonomousShootBalls(shooter, hopper)
+                new AR15_Shooter(hopper, shooter, driveTrain)
     ));
   }
 }

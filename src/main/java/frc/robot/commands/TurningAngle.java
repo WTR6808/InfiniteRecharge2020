@@ -9,6 +9,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
 public class TurningAngle extends CommandBase {
@@ -16,10 +17,16 @@ public class TurningAngle extends CommandBase {
    * Creates a new TurningAngle.
    */
   private double targetAngle =0.0;
+  
+  //Need to move these to Constants and Adjust - Speed is currently to fast and 10 degree accurracy is awful
   private final static double HEADING_TOLERANCE = 10.0;
-  private double speedAdj = 1.0;
+  private double speedAdj = Constants.MAX_ROTATION;//1.0;
+
   private final DriveTrain m_drivetrain;
+
+  //We need to delay to allow time for the reset angle routine to take affect
   private int delay = 0;
+
   public TurningAngle(double target, DriveTrain drivetrain) {
     m_drivetrain = drivetrain;
     targetAngle = target;
@@ -39,25 +46,26 @@ public class TurningAngle extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    //Add delay to allow for angle to reset before starting to execute movement
     if (delay > 10){
-      speedAdj = 2.5;
+      //speedAdj should be a constant so it does not change in multiple places
+      speedAdj = 5;
       m_drivetrain.TeleopKinematicDrive(0.0, -speedAdj*Math.signum(targetAngle));
       SmartDashboard.putNumber("Target Angle", targetAngle);
       speedAdj= SmartDashboard.getNumber("Speed Adj", 0.0);
       SmartDashboard.putNumber("New Adj", speedAdj);
-
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    //We should stop the drivetrain here.
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    
-  return (delay++ >= 10) && (Math.abs(targetAngle) - Math.abs(m_drivetrain.getAngle()) < HEADING_TOLERANCE);
+    return (delay++ >= 10) && (Math.abs(targetAngle) - Math.abs(m_drivetrain.getAngle()) < HEADING_TOLERANCE);
   }
 }

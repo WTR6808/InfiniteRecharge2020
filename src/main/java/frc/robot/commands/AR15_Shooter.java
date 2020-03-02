@@ -7,29 +7,34 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Shooter;
+
+
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
-public class Autonomous2 extends SequentialCommandGroup {
+public class AR15_Shooter extends SequentialCommandGroup {
   /**
-   * Creates a new Autonomous2.
+   * Creates a new AR15_Shooter.
    */
-  DriveTrain m_driveTrain;
-
-  public Autonomous2(DriveTrain driveTrain, Shooter shooter, Hopper hopper) {
+  public AR15_Shooter(Hopper hopper,
+                      Shooter shooter,
+                      DriveTrain drivetrain) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(      sequence( new DriveToDistance(2.0, 1.25, driveTrain), //Speed was 0.8
-                          new TurningAngle(90, driveTrain),
-                          new DriveToDistance(2.0, Units.inchesToMeters(207), driveTrain),
-                          new TurningAngle(90, driveTrain),
-                          new AR15_Shooter(hopper, shooter, driveTrain)
-                          ));
+    super(sequence(new VisionDriveToTarget(drivetrain),
+                   new FullPowerShooter(1.0 , shooter),
+                   new WaitCommand(0.5),
+                   new HopperWorks(hopper),
+                   new WaitCommand(2.5),
+                   new FullPowerShooter(1.0, shooter),
+                   new HopperWorks(hopper)
+    ));
   }
 }

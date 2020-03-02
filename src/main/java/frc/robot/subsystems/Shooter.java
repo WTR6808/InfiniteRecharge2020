@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,16 +28,18 @@ public class Shooter extends SubsystemBase {
     shooter_MotorA.setInverted(true);
     shooter_MotorA.setInverted(InvertType.FollowMaster);
 
-
+    shooter_MotorA.setNeutralMode(NeutralMode.Brake);
+    shooter_MotorB.setNeutralMode(NeutralMode.Brake);
   }
+  
   public void turnON_OFF(double pressure){
     shooter_MotorA.set(pressure);
   }
 
-  public void toggle(){
+  public void toggle(double power){
     on = !on;
     if (on){
-      shooter_MotorA.set(-1.0);
+      shooter_MotorA.set(-power);
     }
     else{
       shooter_MotorA.set(0.0);

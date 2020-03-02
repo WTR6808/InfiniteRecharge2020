@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,14 +31,25 @@ public class Hopper extends SubsystemBase {
     //Need to verify setting of Inverted
     hopperMotorB.setInverted(true);
     hopperMotorA.setInverted(InvertType.FollowMaster);
+
+    //Place in Brake Mode
+    hopperMotorA.setNeutralMode(NeutralMode.Brake);
+    hopperMotorB.setNeutralMode(NeutralMode.Brake);
   }
 
   //Toggles the state of the belt drive between on/off
   //  Will we need to control speed from a trigger?
   public void turnON_OFF(){
     on = !on;
-    if(on) hopperMotorB.set(-0.90);
+    if(on) hopperMotorB.set(Constants.HOPPER_SPEED);
     else hopperMotorB.set(0.0);
+  }
+  public boolean isOff(){
+    return on == false;
+
+  }
+  public void setSpeed(double speed){
+    hopperMotorB.set(speed);
   }
 
   @Override

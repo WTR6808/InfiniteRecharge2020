@@ -22,8 +22,6 @@ public class HopperWorks extends CommandBase {
     m_Hopper = hopper;
     
     addRequirements(m_Hopper);
-
-
   }
 
   // Called when the command is initially scheduled.

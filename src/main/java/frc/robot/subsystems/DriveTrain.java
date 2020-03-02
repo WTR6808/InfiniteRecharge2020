@@ -32,12 +32,13 @@ public class DriveTrain extends SubsystemBase {
   private WPI_VictorSPX rightSlave = new WPI_VictorSPX(Constants.drive_RightRearMotor);
   private DifferentialDrive DriveTrain = new DifferentialDrive(leftMaster, rightMaster);
   private static final double MAX_FORWARD = 1.0;//0.8;
-
+  
   private Encoder leftEncoder = new Encoder(Constants.encoder_LeftA, Constants.encoder_LeftB, false, CounterBase.EncodingType.k2X);
   private Encoder rightEncoder = new Encoder(Constants.encoder_RightA, Constants.encoder_RightB, true, CounterBase.EncodingType.k2X);
 
   private PigeonIMU pIMU = new PigeonIMU(Constants.PIGEON_IMU);
   private int direction = 1;
+  private boolean intakeIsFront = true;
   
   //                                                         P   I  D
   private final PIDController m_leftPID = new PIDController (.30, 0, 0);
@@ -82,11 +83,11 @@ public class DriveTrain extends SubsystemBase {
     //  the other causing rotation instead of forward/reverse motion.
     DriveTrain.setRightSideInverted(false);
 
-    //For Testing Purposes to how drivetrain responds
-    rightMaster.setNeutralMode(NeutralMode.Brake);
-    rightSlave.setNeutralMode(NeutralMode.Brake);
-    leftMaster.setNeutralMode(NeutralMode.Brake);
-    leftSlave.setNeutralMode(NeutralMode.Brake);
+    //Control the Ramp Rate of the Motor Speed
+    rightMaster.configOpenloopRamp(Constants.DRIVETRAIN_RAMP_RATE);
+    rightSlave.configOpenloopRamp(Constants.DRIVETRAIN_RAMP_RATE);
+    leftMaster.configOpenloopRamp(Constants.DRIVETRAIN_RAMP_RATE);
+    leftSlave.configOpenloopRamp(Constants.DRIVETRAIN_RAMP_RATE);
 
     // Program the Encoders
     leftEncoder.setDistancePerPulse(Constants.MDIST_PER_PULSE);
@@ -108,11 +109,27 @@ public class DriveTrain extends SubsystemBase {
     DriveTrain.arcadeDrive(0, 0);
   }
 
+  public void setBrakeMode(){
+    rightMaster.setNeutralMode(NeutralMode.Brake);
+    rightSlave.setNeutralMode(NeutralMode.Brake);
+    leftMaster.setNeutralMode(NeutralMode.Brake);
+    leftSlave.setNeutralMode(NeutralMode.Brake);
+  }
+
+  public void setCoastMode(){
+    rightMaster.setNeutralMode(NeutralMode.Coast);
+    rightSlave.setNeutralMode(NeutralMode.Coast);
+    leftMaster.setNeutralMode(NeutralMode.Coast);
+    leftSlave.setNeutralMode(NeutralMode.Coast);
+  }
+
   //Used as a multiplier to forward speed to reverse the front and back of the robot
   //  Helps the driver by allowing the robot to always be oriented asa if driving forward
   //  insted of one direction being like backing up a car (left and right are reversed)
   public void changeFront() {
     direction *= -1;
+
+    intakeIsFront = !intakeIsFront;
   }
 
   //Use Speed and rotation to Drive the Robot, Y axis is forward speed, X axis is rotation
@@ -128,11 +145,13 @@ public class DriveTrain extends SubsystemBase {
     //leftSlave.set(speed);
     
     //Uncomment if we want to see Left and Right Encoder values for testing and tuning
+  /*  
     SmartDashboard.putNumber("Left Encoder  ", leftEncoder.getRaw());
     SmartDashboard.putNumber("Right Encoder ", rightEncoder.getRaw());
     SmartDashboard.putNumber("Right Distance", getRightDistance());
     SmartDashboard.putNumber("Left Distance ", getLeftDistance());
     SmartDashboard.putNumber("Avg Distance  ", getAverageDistance());
+  */
   }
   
   //Used the new 2020 API for driving with Kinematic, PID control for smoother acceleration/deacceleration
@@ -144,6 +163,18 @@ public class DriveTrain extends SubsystemBase {
     double rightOutput = m_rightPID.calculate (-rightEncoder.getRate(),
                                                -wheelSpeeds.rightMetersPerSecond);
 
+    //Comment out left and right Master output setting for testing and uncomment
+    //  TeleopArcadeDrive so all parameters can be viewed and signs determined
+    if (intakeIsFront){
+      leftMaster.set (-1*direction * leftOutput);
+      rightMaster.set(-1*direction * rightOutput);
+  } else {
+      leftMaster.set (-1*direction * rightOutput);
+      rightMaster.set(-1*direction * leftOutput);
+  }
+  //TeleopArcadeDrive(speed, rotation);
+
+/*
     SmartDashboard.putNumber("Left Output  ", -leftOutput);
     SmartDashboard.putNumber("Right Output ", -rightOutput);
     SmartDashboard.putNumber("Right Rate", rightEncoder.getRate());
@@ -158,14 +189,7 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Right Distance", getRightDistance());
     SmartDashboard.putNumber("Left Distance ", getLeftDistance());
     SmartDashboard.putNumber("Avg Distance  ", getAverageDistance());
-
-    //Comment out left and right Master output setting for testing and uncomment
-    //  TeleopArcadeDrive so all parameters can be viewed and signs determined
-    
-    //Need to validate the direction indicator for switching front/back is correct
-    leftMaster.set (-1*direction * leftOutput);
-    rightMaster.set(-1*direction * rightOutput);
-    //TeleopArcadeDrive(speed, rotation);
+*/
   }
 
   //Resests the accumulated encoder distances to 0.0;
@@ -219,9 +243,13 @@ public class DriveTrain extends SubsystemBase {
   }
 
   //Uses LimeLight Tracking Data to Drive to Target in Arcade Mode
-    public boolean visionDriveArcade(){
+  public boolean visionDriveArcade(){
     if (limeLight.calcDoubleS()){
+      int saveDirection = direction;
+      direction = 1;
       this.TeleopArcadeDrive(limeLight.getDriveCommand(), limeLight.getSteerCommand());
+      direction = saveDirection;
+      
       SmartDashboard.putNumber("TX", limeLight.getTX());
       SmartDashboard.putNumber("TY", limeLight.getTY());
       SmartDashboard.putNumber("TA", limeLight.getTA());
@@ -237,7 +265,8 @@ public class DriveTrain extends SubsystemBase {
   //Uses LimeLight Tracking Data to Drive to Target Using Kinematics
   public boolean visionDriveKinematic(){
     if (limeLight.calcDoubleS()){
-      this.TeleopKinematicDrive(-limeLight.getDriveCommand(), limeLight.getSteerCommand());
+      this.TeleopKinematicDrive(-limeLight.getDriveCommand()*1.5, 
+                                 limeLight.getSteerCommand()*Constants.MAX_ROTATION);
       SmartDashboard.putNumber("TX", limeLight.getTX());
       SmartDashboard.putNumber("TY", limeLight.getTY());
       SmartDashboard.putNumber("TA", limeLight.getTA());

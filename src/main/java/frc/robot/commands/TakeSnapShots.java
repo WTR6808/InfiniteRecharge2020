@@ -8,12 +8,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+//import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.DriveTrain;
 
 public class TakeSnapShots extends CommandBase {
   private final DriveTrain m_drivetrain;
-  private WaitCommand executionTime;
+  //private WaitCommand executionTime;
   /**
    * Creates a new TakeSnapShots.
    */
@@ -27,7 +27,7 @@ public class TakeSnapShots extends CommandBase {
   @Override
   public void initialize() {
     //Take Snapshots for 5 Seconds
-    executionTime = new WaitCommand(5.0);
+    //executionTime = new WaitCommand(5.0);
     m_drivetrain.toggleTakeSnapShots();
   }
 
@@ -47,6 +47,6 @@ public class TakeSnapShots extends CommandBase {
   @Override
   public boolean isFinished() {
     //End when time has expired
-    return executionTime.isFinished();
+    return false;//executionTime.isFinished();
   }
 }

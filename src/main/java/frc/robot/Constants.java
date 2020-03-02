@@ -18,43 +18,45 @@ import edu.wpi.first.wpilibj.util.Units;
  */
 public final class Constants {
     //Encoder DIO Ports
-    public static int encoder_LeftA  = 8;
-    public static int encoder_RightA = 6;
-    public static int encoder_LeftB  = 9;
-    public static int encoder_RightB = 7;
+    public static final int encoder_LeftA  = 8;
+    public static final int encoder_RightA = 6;
+    public static final int encoder_LeftB  = 9;
+    public static final int encoder_RightB = 7;
 
     //constants E4T encoders CPR = 360 x 4 = 1440 pulses /revolution 
-    public static double ENCODER_PPR = 360.0*4;//360 CPR * 4pulses/rev
+    public static final double ENCODER_PPR = 360.0*4;//360 CPR * 4pulses/rev
 
     // Need to adjust Wheel Diameter for new robot, 7.5" ?
     //public static double WHEEL_DIAM = 6.0;//inches Pratice Bot
-    public static double WHEEL_DIAM = 7.5;//inches 2020 Bot
-    public static double MWHEEL_DIAM = Units.inchesToMeters(WHEEL_DIAM); 
+    public static final double WHEEL_DIAM = 7.5;//inches 2020 Bot
+    public static final double MWHEEL_DIAM = Units.inchesToMeters(WHEEL_DIAM); 
 
-    public static double DIST_PER_PULSE = ((WHEEL_DIAM*Math.PI)/ENCODER_PPR)*1.14;
-    public static double MDIST_PER_PULSE = Units.inchesToMeters(DIST_PER_PULSE);
-    public static double DIST_ADJUSTMENT = 10.5;//7.1;//3.55; //This might need to be tweeked for new robot
+    public static final double DIST_PER_PULSE = ((WHEEL_DIAM*Math.PI)/ENCODER_PPR)*1.14;
+    public static final double MDIST_PER_PULSE = Units.inchesToMeters(DIST_PER_PULSE);
+    public static final double DIST_ADJUSTMENT = 10.5;//7.1;//3.55; //This might need to be tweeked for new robot
 
     //Need to adjust Track Width for the new robot, 19.25" ?
     //public static double TRACK_WIDTH = 23.0; //inches Practice Bot
-    public static double TRACK_WIDTH = 19.25; //inches 2020 Bot
-    public static double MTRACK_WIDTH = Units.inchesToMeters(TRACK_WIDTH);
+    public static final double TRACK_WIDTH = 19.25; //inches 2020 Bot
+    public static final double MTRACK_WIDTH = Units.inchesToMeters(TRACK_WIDTH);
 
-    public static double MAX_ROTATION = 2.0*Math.PI;
-    public static double MAX_SPEED = 3.0;
+    public static final double MAX_ROTATION = 2.0*Math.PI;
+    public static final double MAX_SPEED = 2.5; //3.0;
 
     //Drive Train Motor CAN Bus Addresses Front Motors are Masters
-    public static int drive_LeftFrontMotor  = 10;
-    public static int drive_RightFrontMotor = 20;
-    public static int drive_LeftRearMotor   = 11;
-    public static int drive_RightRearMotor  = 21;
-
+    public static final int drive_LeftFrontMotor  = 10;
+    public static final int drive_RightFrontMotor = 20;
+    public static final int drive_LeftRearMotor   = 11;
+    public static final int drive_RightRearMotor  = 21;
+    public static final double DRIVETRAIN_RAMP_RATE = 0.15; //Seconds form Neutral to Full Speed
+ 
     //CAN Bus Address for Spinner Motor (Used to spin the color wheel)
     public static final int spinner_CentralMotor = 30;
 
     //CAN Bus Addresses for the Hopper Motors, Motor B is the Master
     public static final int hopper_motorA = 31;
     public static final int hopper_motorB = 32;
+    public static final double HOPPER_SPEED = -0.4;
 
     //Can Bus Address for the Ball Shotter Motors
     public static final int shooter_motorA = 33;
@@ -62,6 +64,8 @@ public final class Constants {
 
     //Can Bus Address for the Ball Intake Motor
     public static final int intake_motor =35;
+    public static final double INTAKE_SPEED = -0.50;
+    public static final double intake_reverse = 0.75;
     
     //Can Bus and Timeout for the Gyroscope
     public static final int PIGEON_IMU = 40;

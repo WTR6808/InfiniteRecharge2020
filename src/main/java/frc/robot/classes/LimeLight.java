@@ -19,8 +19,8 @@ public class LimeLight {
     private static final double TX_MAX = 27.0/2.5;//54.0;
     private static final double TY_MAX = 20.5/2.5;//41.0;
   
-    private static final double X_TOLERANCE = 1.0;
-    private static final double Y_TOLERANCE = 0.25;
+    private static final double X_TOLERANCE = 1.00;
+    private static final double Y_TOLERANCE = 1.00;
 //    private static final double LIMIT = 1.0;
   
     private static double  leftSpeed   = 0.0;

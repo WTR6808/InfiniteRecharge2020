@@ -18,11 +18,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static Object m_driveTrain;
+  //public static Object m_driveTrain;
 
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -66,7 +67,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
+    //Put DriveTrain in Brake Mode - Current Drivetrain Chains are loose causing angle drift at stop
+    m_robotContainer.AutonomousInit();
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -89,6 +91,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    //For testing purposes put drivetrain in coast mode for smoother stopping
+    m_robotContainer.TeleopInit();
   }
 
   /**

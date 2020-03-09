@@ -48,8 +48,8 @@ public class DriveToDistance extends CommandBase {
   @Override
   public void execute() {
     //Wait 5 cycles to make sure encoders have reset
-    //if (++timeDelay>5) m_drivetrain.TeleopArcadeDrive(m_speed, 0.0);
-    if (++timeDelay>5) m_drivetrain.TeleopKinematicDrive(Math.signum(m_targetdistance)*(m_speed+0.2), 0.0);
+    if (++timeDelay>5) m_drivetrain.TeleopArcadeDrive(m_speed, 0.0);
+    //if (++timeDelay>5) m_drivetrain.TeleopKinematicDrive(Math.signum(m_targetdistance)*(m_speed+0.2), 0.0);
   }
 
   // Called once the command ends or is interrupted.

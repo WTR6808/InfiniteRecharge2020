@@ -19,8 +19,8 @@ public class TurningAngle extends CommandBase {
   private double targetAngle =0.0;
   
   //Need to move these to Constants and Adjust - Speed is currently to fast and 10 degree accurracy is awful
-  private final static double HEADING_TOLERANCE = 10.0;
-  private double speedAdj = Constants.MAX_ROTATION;//1.0;
+  //private final static double HEADING_TOLERANCE = 10.0;
+  private double speedAdj = Constants.DRIVETRAIN_MAX_ROT;
 
   private final DriveTrain m_drivetrain;
 
@@ -49,11 +49,12 @@ public class TurningAngle extends CommandBase {
     //Add delay to allow for angle to reset before starting to execute movement
     if (delay > 10){
       //speedAdj should be a constant so it does not change in multiple places
-      speedAdj = 5;
-      m_drivetrain.TeleopKinematicDrive(0.0, -speedAdj*Math.signum(targetAngle));
-      SmartDashboard.putNumber("Target Angle", targetAngle);
-      speedAdj= SmartDashboard.getNumber("Speed Adj", 0.0);
-      SmartDashboard.putNumber("New Adj", speedAdj);
+      //speedAdj = 5;
+      //m_drivetrain.TeleopKinematicDrive(0.0, -speedAdj*Math.signum(targetAngle));
+      m_drivetrain.TeleopArcadeDrive(0.0, speedAdj * Math.signum(targetAngle));
+//      SmartDashboard.putNumber("Target Angle", targetAngle);
+//      speedAdj= SmartDashboard.getNumber("Speed Adj", 0.0);
+//      SmartDashboard.putNumber("New Adj", speedAdj);
     }
   }
 
@@ -66,6 +67,6 @@ public class TurningAngle extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (delay++ >= 10) && (Math.abs(targetAngle) - Math.abs(m_drivetrain.getAngle()) < HEADING_TOLERANCE);
+    return (delay++ >= 10) && (Math.abs(targetAngle) - Math.abs(m_drivetrain.getAngle()) < Constants.HEADING_TOLERANCE);
   }
 }

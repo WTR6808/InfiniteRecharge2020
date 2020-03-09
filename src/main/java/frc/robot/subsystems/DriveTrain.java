@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants;
 import frc.robot.classes.LimeLight;
 
@@ -31,10 +32,9 @@ public class DriveTrain extends SubsystemBase {
   private WPI_VictorSPX rightMaster = new WPI_VictorSPX(Constants.drive_RightFrontMotor);
   private WPI_VictorSPX rightSlave = new WPI_VictorSPX(Constants.drive_RightRearMotor);
   private DifferentialDrive DriveTrain = new DifferentialDrive(leftMaster, rightMaster);
-  private static final double MAX_FORWARD = 1.0;//0.8;
   
-  private Encoder leftEncoder = new Encoder(Constants.encoder_LeftA, Constants.encoder_LeftB, false, CounterBase.EncodingType.k2X);
-  private Encoder rightEncoder = new Encoder(Constants.encoder_RightA, Constants.encoder_RightB, true, CounterBase.EncodingType.k2X);
+  private Encoder leftEncoder = new Encoder(Constants.encoder_LeftA, Constants.encoder_LeftB, true, CounterBase.EncodingType.k2X);
+  private Encoder rightEncoder = new Encoder(Constants.encoder_RightA, Constants.encoder_RightB, false, CounterBase.EncodingType.k2X);
 
   private PigeonIMU pIMU = new PigeonIMU(Constants.PIGEON_IMU);
   private int direction = 1;
@@ -64,7 +64,7 @@ public class DriveTrain extends SubsystemBase {
 
     // Winged Hussars May need Work
 
-    //For a tuning a new DriveTrain, use setInverted so that the controller blinks
+    //For tuning a new DriveTrain, use setInverted so that the controller blinks
     //  Green for forward motion, and Red for reverse motion.  Motors on the same
     //  side should have the same inversion setting
     rightMaster.setInverted(true);
@@ -83,15 +83,15 @@ public class DriveTrain extends SubsystemBase {
     //  the other causing rotation instead of forward/reverse motion.
     DriveTrain.setRightSideInverted(false);
 
-    //Control the Ramp Rate of the Motor Speed
+    //Control the Ramp Rate of the Motor Speed, Ramp Rate should not be used with PID Control?
     rightMaster.configOpenloopRamp(Constants.DRIVETRAIN_RAMP_RATE);
     rightSlave.configOpenloopRamp(Constants.DRIVETRAIN_RAMP_RATE);
     leftMaster.configOpenloopRamp(Constants.DRIVETRAIN_RAMP_RATE);
     leftSlave.configOpenloopRamp(Constants.DRIVETRAIN_RAMP_RATE);
 
     // Program the Encoders
-    leftEncoder.setDistancePerPulse(Constants.MDIST_PER_PULSE);
-    rightEncoder.setDistancePerPulse(Constants.MDIST_PER_PULSE);
+    leftEncoder.setDistancePerPulse(Constants.LEFT_MDIST_PER_PULSE);
+    rightEncoder.setDistancePerPulse(Constants.RIGHT_MDIST_PER_PULSE);
     resetDistance();
     
     //Initialize the LimeLight to Driver Mode
@@ -101,8 +101,24 @@ public class DriveTrain extends SubsystemBase {
     pIMU.setFusedHeading(0.0, Constants.PIGEON_TIMEOUT);
   }
   /*End Creation of DriveTrain***********************************/
+  //Routine being added to all subsystems
+  public void Reset(){
+    //Set direction to intake is front of robot
+    ResetFront();
 
+    //Reset the drivetrain sensors
+    resetAngle();
+    resetDistance();
+    setDriverMode();
+  }
   /*Driving Methods**********************************************/
+  
+  //Resets the Intake to be the Robot's Front
+  public void ResetFront(){
+    //Make intake the front of the robot
+    direction = 1;
+    intakeIsFront = true;
+  }
   
   //Sets the Drivetrain Motors to speed and rotation of 0.0 to stop all motion
   public void Stop() {
@@ -132,26 +148,36 @@ public class DriveTrain extends SubsystemBase {
     intakeIsFront = !intakeIsFront;
   }
 
+  private double LimitInput(double value){
+    //Use Clamp to limit maximum magnitude to +/- DRIVETRAIN_MAXSPEED constant
+    //Set to Zero if inside the deadzone for the joystick
+    return MathUtil.clamp((Math.abs(value)<Constants.DRIVETRAIN_DEADZONE)?0.0:value,-Constants.DRIVETRAIN_MAXSPEED, Constants.DRIVETRAIN_MAXSPEED);
+    //return value;
+  }
+
   //Use Speed and rotation to Drive the Robot, Y axis is forward speed, X axis is rotation
   public void TeleopArcadeDrive(double speed, double rot) {
     //For Testing a new Drivetrain.  Comment out call to arcadeDrive, then enable
     //  each motor, one at a time, by uncommenting the set(speed) command.
     //  Change inversion in the constructors until controller reads green for 
     //  forward control and red for reverse.  Repeat for each motor.
-    DriveTrain.arcadeDrive(direction * speed * MAX_FORWARD, rot);
+    DriveTrain.arcadeDrive(direction * LimitInput(speed), LimitInput(rot));
+    SmartDashboard.putNumber("arcade speed", speed);
+    SmartDashboard.putNumber("arcade rot", rot);
     //rightMaster.set(speed);
     //rightSlave.set(speed);
     //leftMaster.set(speed);
     //leftSlave.set(speed);
     
     //Uncomment if we want to see Left and Right Encoder values for testing and tuning
-  /*  
+    
+    SmartDashboard.putNumber("Right Rate", rightEncoder.getRate());
+    SmartDashboard.putNumber("Left Rate ", leftEncoder.getRate());
     SmartDashboard.putNumber("Left Encoder  ", leftEncoder.getRaw());
     SmartDashboard.putNumber("Right Encoder ", rightEncoder.getRaw());
     SmartDashboard.putNumber("Right Distance", getRightDistance());
     SmartDashboard.putNumber("Left Distance ", getLeftDistance());
     SmartDashboard.putNumber("Avg Distance  ", getAverageDistance());
-  */
   }
   
   //Used the new 2020 API for driving with Kinematic, PID control for smoother acceleration/deacceleration
@@ -174,9 +200,8 @@ public class DriveTrain extends SubsystemBase {
   }
   //TeleopArcadeDrive(speed, rotation);
 
-/*
-    SmartDashboard.putNumber("Left Output  ", -leftOutput);
-    SmartDashboard.putNumber("Right Output ", -rightOutput);
+    SmartDashboard.putNumber("Left Output  ", leftOutput);
+    SmartDashboard.putNumber("Right Output ", rightOutput);
     SmartDashboard.putNumber("Right Rate", rightEncoder.getRate());
     SmartDashboard.putNumber("Left Rate ", leftEncoder.getRate());
     SmartDashboard.putNumber("Left Wheel Speed",wheelSpeeds.leftMetersPerSecond);
@@ -189,10 +214,9 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Right Distance", getRightDistance());
     SmartDashboard.putNumber("Left Distance ", getLeftDistance());
     SmartDashboard.putNumber("Avg Distance  ", getAverageDistance());
-*/
   }
 
-  //Resests the accumulated encoder distances to 0.0;
+  //Resets the accumulated encoder distances to 0.0;
   public void resetDistance(){
     leftEncoder.reset();
     rightEncoder.reset();
@@ -200,17 +224,17 @@ public class DriveTrain extends SubsystemBase {
 
   //Returns the Distance in Meters Recorded by the left side encoder
   public double getLeftDistance(){
-    return leftEncoder.getDistance()*Constants.DIST_ADJUSTMENT;
+    return leftEncoder.getDistance();//*Constants.LEFT_DIST_ADJUSTMENT; //This is being accounted for in Distance Per Pulse now 3/5/20
   }
 
   //Returns the Distance in Meters Recorded by the right side encoder
   public double getRightDistance(){
-    return rightEncoder.getDistance()*Constants.DIST_ADJUSTMENT;
+    return rightEncoder.getDistance();//*Constants.DIST_ADJUSTMENT; //This is being accounted for in Distance Per Pulse now 3/5/20
   }
 
   //Returns the Average Distance between the Left and Right side encoders
   public double getAverageDistance(){
-    return (getLeftDistance()+getRightDistance())/2;
+    return (getLeftDistance());//+getRightDistance())/2;
   }
   /*End Driving Methods**********************************************/
 
@@ -245,10 +269,16 @@ public class DriveTrain extends SubsystemBase {
   //Uses LimeLight Tracking Data to Drive to Target in Arcade Mode
   public boolean visionDriveArcade(){
     if (limeLight.calcDoubleS()){
-      int saveDirection = direction;
-      direction = 1;
+      //Save the current driving direction and set the Intake to the Front
+      //int saveDirection = direction;
+      //direction = 1;
+      //intakeIsFront = true;
+                             //Drive toward target should be negative
       this.TeleopArcadeDrive(limeLight.getDriveCommand(), limeLight.getSteerCommand());
-      direction = saveDirection;
+      
+      //Reset the front of the Robot to the saved direction
+      //direction = saveDirection;
+      //intakeIsFront = (direction == 1);
       
       SmartDashboard.putNumber("TX", limeLight.getTX());
       SmartDashboard.putNumber("TY", limeLight.getTY());

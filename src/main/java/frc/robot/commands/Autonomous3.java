@@ -24,9 +24,9 @@ public class Autonomous3 extends SequentialCommandGroup {
   public Autonomous3(DriveTrain driveTrain, Shooter shooter, Hopper hopper) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(sequence( new DriveToDistance(2.0, 1.25, driveTrain), //Speed was 0.8
+    super(sequence( new DriveToDistance(0.8, -1.25, driveTrain), //Speed was 0.8
                     new TurningAngle(-90, driveTrain),
-                    new DriveToDistance(2.0, Units.inchesToMeters(-52), driveTrain),
+                    new DriveToDistance(0.8, -Units.inchesToMeters(-52), driveTrain),
                     new TurningAngle(-90, driveTrain),
                     new AR15_Shooter(hopper, shooter, driveTrain)
                     ));

@@ -7,7 +7,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Hopper;
@@ -16,23 +15,19 @@ import frc.robot.subsystems.Shooter;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
-public class Autonomous1 extends SequentialCommandGroup {
+public class AutoTurn_AndShoot extends SequentialCommandGroup {
   /**
-   * Creates a new Autonomous1.
+   * Creates a new AutoTurn_AndShoot.
    */
   DriveTrain m_driveTrain;
-  
-  public Autonomous1(DriveTrain driveTrain, Shooter shooter, Hopper hopper)
-  {
+  Hopper m_hopper;
+  Shooter m_shooter;
+  public AutoTurn_AndShoot(Hopper hopper, Shooter shooter, DriveTrain drivetrain) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(
-      sequence( new DriveToDistance(0.8, -1.25, driveTrain), //Speed was 0.8
-                new TurningAngle(90, driveTrain),
-                new DriveToDistance(0.8, -Units.inchesToMeters(77), driveTrain),//-77
-                new TurningAngle(90, driveTrain),
-                new AR15_Shooter(hopper, shooter, driveTrain)
-    ));
+    super(sequence(new AR15_Shooter(hopper, shooter, drivetrain),
+                   new DriveToDistance(0.65, -1.0, drivetrain)
+          ));
+
   }
 }
-

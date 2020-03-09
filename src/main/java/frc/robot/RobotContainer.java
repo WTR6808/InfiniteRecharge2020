@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-import java.util.Map;
-
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -16,40 +14,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DriveToDistance;
 import frc.robot.commands.FullPowerShooter;
-import frc.robot.commands.HopperWorks;
 import frc.robot.commands.HopperWorksVariable;
-import frc.robot.commands.IntakeAbility;
 import frc.robot.commands.IntakeAbilityVariable;
-import frc.robot.commands.KinematicDrive;
-import frc.robot.commands.ManualShooter;
 import frc.robot.commands.ReverseHopper;
 import frc.robot.commands.ReverseIntake;
-import frc.robot.commands.ShootBall;
-import frc.robot.commands.ShortHop;
-import frc.robot.commands.SpinWheel;
 import frc.robot.commands.TakeSnapShots;
 import frc.robot.commands.TurningAngle;
-import frc.robot.commands.UnjamIntakeGroup;
 import frc.robot.commands.VisionDriveToTarget;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.RainbowBlast;
 import frc.robot.subsystems.Shooter;
-import frc.robot.commands.AR15_Shooter;
 import frc.robot.commands.ArcadeDrive;
+import frc.robot.commands.AutoTurn_AndShoot;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
 import frc.robot.commands.Autonomous3;
-import frc.robot.commands.Cancel;
 import frc.robot.commands.ChangeFront;
 import frc.robot.commands.Darkness;
-
-import static java.util.Map.entry;
 
 //import frc.robot.commands.ExampleCommand;
 //import frc.robot.subsystems.ExampleSubsystem;
@@ -85,14 +70,14 @@ public class RobotContainer {
 
     //Setup the Default Commands
     //DriveTrain using new Kinematics for driving
-    m_DriveTrain.setDefaultCommand(new KinematicDrive(()->m_Driver.getY(Hand.kLeft),
-                                                      ()->m_Driver.getX(Hand.kLeft),
-                                                      m_DriveTrain)); 
+    //m_DriveTrain.setDefaultCommand(new KinematicDrive(()->m_Driver.getY(Hand.kLeft),
+    //                                                  ()->m_Driver.getX(Hand.kLeft),
+    //                                                  m_DriveTrain)); 
     
     //DriveTrain using older style ArcadeDrive for driving
-    //m_DriveTrain.setDefaultCommand(new ArcadeDrive(()->m_Driver.getY(Hand.kLeft),
-    //                                               ()->m_Driver.getX(Hand.kLeft),
-    //                                               m_DriveTrain)); 
+    m_DriveTrain.setDefaultCommand(new ArcadeDrive(()->m_Driver.getY(Hand.kLeft),
+                                                   ()->m_Driver.getX(Hand.kLeft),
+                                                   m_DriveTrain)); 
 
     //Trigger control of Ball Intake Motor
     //We are using the Left Joystick for driving, use the Right Trigger for the intake                                                      
@@ -105,26 +90,16 @@ public class RobotContainer {
     //Create the USB Camera Stream for Microsoft LifeCam
     CameraServer.getInstance().startAutomaticCapture();
 
-    //Add usefull debugging information to our dashboard
-    //  Comment out for competition?
-    //Display the currently executing command
-    SmartDashboard.putData(CommandScheduler.getInstance());
-    //Display the status of the subsystems
-    SmartDashboard.putData(m_DriveTrain);
-    SmartDashboard.putData(shooterMotor);
-    SmartDashboard.putData(hopperMotor);
-    SmartDashboard.putData(intakeMotor);
-
     //Create our Sendable Chooser Here
     //    m_Chooser.addOption("No Auto", null);
-    m_Chooser.setDefaultOption("No Auto", null);
+    m_Chooser.addOption("No Auto", null);
     m_Chooser.addOption("Position Left", new Autonomous2(m_DriveTrain,shooterMotor, hopperMotor));
     m_Chooser.addOption("Position Middle", new Autonomous1(m_DriveTrain, shooterMotor, hopperMotor));
     m_Chooser.addOption("Position Right", new Autonomous3(m_DriveTrain, shooterMotor, hopperMotor));
+    m_Chooser.setDefaultOption("Inline with Target", new AutoTurn_AndShoot(hopperMotor, shooterMotor, m_DriveTrain));
     SmartDashboard.putData("Autonomous Selection", m_Chooser);
 
-    SmartDashboard.putNumber("Selected Command", 1);
-      
+    SmartDashboard.putNumber("Selected Command", 4);
   }  
 
   /**
@@ -162,40 +137,21 @@ public class RobotContainer {
   */
 
     //Mappings for Competition
-    //Toggle the Shooter to on Full Power
-    //driver_B.whenPressed(new FullPowerShooter(1.0,shooterMotor));
-    //driver_B.whenReleased(new FullPowerShooter(0.0,shooterMotor));
+    driver_Y.whenPressed(new FullPowerShooter(1.0,shooterMotor));                 //Toggle Shooter Wheels On/Off
+    driver_X.whenPressed(new ChangeFront(m_DriveTrain));                          //Reverses the Front of the Robot (Intake is normally the Front)
+    driver_A.whenPressed(new Darkness(m_DriveTrain));                             //Toggle the Limelight between Driver and Vision Tracking modes
+    driver_B.whenPressed(new TakeSnapShots(m_DriveTrain).withTimeout(2));         //Cause Limelight to Take Snapshots of the Target for 2 seconds
 
-    //driver_B.whenPressed(new TurningAngle(90, m_DriveTrain));
-    driver_B.whenPressed(new TakeSnapShots(m_DriveTrain).withTimeout(2));
-    driver_Y.whenPressed(new ReverseHopper(hopperMotor).withTimeout(.2));
-    driver_Back.whileHeld(new ReverseHopper(hopperMotor));
-    //Turn Hopper On when pressed/Off when released
-    //driver_B.whenPressed(new HopperWorks(hopperMotor));
-    //driver_B.whenReleased(new HopperWorks(hopperMotor));
+    //Right Trigger default Command for Intake                                    //Right Trigger is Forward Control of Intake Motor
+    driver_RightBumper.whileHeld(new ReverseIntake(intakeMotor));                 //Reverse the Intake Motor to UnJam Balls
+    //Left Trigger default Command for Hopper                                     //Left Trigger is Forward Control of Hopper Motor
+    driver_LeftBumper.whileHeld(new ReverseHopper(hopperMotor));                  //Reverse the Hopper until Left Bumper button is released
 
-    //Toggle the Intake Motor On/Off when pressed/released
-    /*driver_L3.whenPressed(new IntakeAbility(intakeMotor));
-    driver_L3.whenReleased(new IntakeAbility(intakeMotor));*/
-    driver_LeftBumper.whileHeld(new ReverseIntake(intakeMotor));
-    driver_RightBumper.whenPressed(new Darkness(m_DriveTrain));
-    driver_X.whenPressed(new ChangeFront(m_DriveTrain));
-    //driver_Back.whenPressed(new ManualShooter(hopperMotor, shooterMotor));
-    //driver_Back.whenReleased(new Cancel(shooterMotor, hopperMotor, intakeMotor));
-    driver_A.whenPressed(new FullPowerShooter(1.0,shooterMotor));
-    driver_Start.whenPressed(new VisionDriveToTarget(m_DriveTrain));
+    driver_Start.whenPressed(new VisionDriveToTarget(m_DriveTrain));              //Line up the Robot with the target using the Limelight.  Timeout after 2 seconds
+    //driver_Back.whenPressed(new ReverseHopper(hopperMotor).withTimeout(.2));    //Currently Unused
 
-
-    //Toggle the Limelight Drive/Vision Modes
-    //driver_Y.whenPressed(new Darkness(m_DriveTrain));
-
-
-    //Mappings for Testing/Tuning robot.  Comment out for competition
-    //driver_Y.whenPressed(new TurningAngle(90.0, m_DriveTrain));
-    //driver_A.whenPressed(new DriveToDistance(0.7, 2, m_DriveTrain));
-    //in meters
-    //driverX_R3.whenPressed(new Autonomous1(m_DriveTrain, shooterMotor, hopperMotor));
-    //driver_R3.whenPressed(new AR15_Shooter(hopperMotor, shooterMotor));
+    driver_L3.whenPressed(new DriveToDistance(0.65, 1.0, m_DriveTrain));          //Drive Forward at 65% speed for 1 meter.  For Testing, Remove for Competition.
+    driver_R3.whenPressed(new TurningAngle(90.0, m_DriveTrain));                  //Turn 90 degrees clockwise.  For Testing, Remove for Competition.
   }
 
   /**
@@ -207,7 +163,7 @@ public class RobotContainer {
   
   public Command getAutonomousCommand() {
     //return new Autonomous1(m_DriveTrain, shooterMotor, hopperMotor);
-    double selection=2.0;
+    double selection=4.0;
     // An ExampleCommand will run in autonomous
     //Left  Position
     //return new Autonomous2(m_DriveTrain, shooterMotor, hopperMotor);
@@ -218,23 +174,32 @@ public class RobotContainer {
     //Right Position
     //return new Autonomous3(m_DriveTrain, shooterMotor, hopperMotor);
     
-    //m_Chooser.getSelected();
+    //Lineup/Shoot and Move off line
+    //return new AutoTurn_AndShoot(hopperMotor, shooterMotor, m_DriveTrain);
+    //return m_Chooser.getSelected();
 
-    selection = SmartDashboard.getNumber("Selected Command",0.0);
+    selection = SmartDashboard.getNumber("Selected Command",4.0);
     
 
-     if(selection == 1.0) {
+    if(selection == 1.0) {
+      //Lined up at Far Left
       return new Autonomous2(m_DriveTrain, shooterMotor, hopperMotor);
-
     }
     else if(selection == 2.0){
+      //Lined up in Center of Field
       return new Autonomous1(m_DriveTrain, shooterMotor, hopperMotor);
     }
     else if(selection == 3.0){
+      //Lined up at Far Right
       return new Autonomous3(m_DriveTrain, shooterMotor, hopperMotor);
     }
+    else if(selection ==4.0){
+      //Lined up near in line with target (Preferred and default position)
+      return new AutoTurn_AndShoot(hopperMotor, shooterMotor, m_DriveTrain);
+    }
     else{
-      return new DriveToDistance(0.7, 1.25, m_DriveTrain);
+      //Fail Safe in case selection is read incorrectly will guarentee getting of the line
+      return new DriveToDistance(0.7, 1.25, m_DriveTrain);  
     }
 }
 
@@ -243,6 +208,19 @@ public class RobotContainer {
   }
 
   public void TeleopInit(){
+    m_DriveTrain.Reset();
     m_DriveTrain.setCoastMode();
+  }
+
+  public void RobotPeriodic(){
+    //Add usefull debugging information to our dashboard
+    //  Comment out for competition
+    //Display the currently executing command
+    SmartDashboard.putData(CommandScheduler.getInstance());
+    //Display the status of the subsystems
+    SmartDashboard.putData(m_DriveTrain);
+    SmartDashboard.putData(shooterMotor);
+    SmartDashboard.putData(hopperMotor);
+    SmartDashboard.putData(intakeMotor);
   }
 }

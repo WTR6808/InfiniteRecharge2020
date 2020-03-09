@@ -28,7 +28,7 @@ public class AR15_Shooter extends SequentialCommandGroup {
                       DriveTrain drivetrain) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(sequence(new VisionDriveToTarget(drivetrain),
+    super(sequence(new VisionDriveToTarget(drivetrain).withTimeout(2.5),
                    new FullPowerShooter(1.0 , shooter),
                    new WaitCommand(0.5),
                    new HopperWorks(hopper),

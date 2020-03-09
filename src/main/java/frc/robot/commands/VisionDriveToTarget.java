@@ -27,6 +27,7 @@ public class VisionDriveToTarget extends CommandBase {
   @Override
   public void initialize() {
     noTarget=false;
+    m_driveTrain.ResetFront();
     m_driveTrain.setVisionNode();
     m_driveTrain.Stop();
   }
@@ -34,8 +35,8 @@ public class VisionDriveToTarget extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //noTarget = !m_driveTrain.visionDriveArcade(); //returns true if target found
-    noTarget = !m_driveTrain.visionDriveKinematic(); //returns true if target found
+    noTarget = !m_driveTrain.visionDriveArcade(); //returns true if target found
+    //noTarget = !m_driveTrain.visionDriveKinematic(); //returns true if target found
   }
 
   // Called once the command ends or is interrupted.

@@ -37,10 +37,8 @@ public class ArcadeDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-                                  //make forward positive    
+                                  //make forward positive, xbox controller forward is negative   
     m_DriveTrain.TeleopArcadeDrive(-speed.getAsDouble(), rotation.getAsDouble());
-
-
   }
 
   // Called once the command ends or is interrupted.

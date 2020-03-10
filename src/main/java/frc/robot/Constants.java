@@ -55,7 +55,7 @@ public final class Constants {
     public static final double DRIVETRAIN_RAMP_RATE = 0.75; //Seconds form Neutral to Full Speed
     public static final double DRIVETRAIN_DEADZONE = 0.20;  //Minimum Value of Joystick Input
     public static final double DRIVETRAIN_MAXSPEED = 0.80;  //Maximum Value of Joystick Input
-    public static final double DRIVETRAIN_MAX_ROT  = 0.70;  //Maximum Rotation for Arcade Drive
+    public static final double DRIVETRAIN_MAX_ROT  = 0.55;//0.70;  //Maximum Rotation for Turn to Angle Command
 
     //CAN Bus Address for Spinner Motor (Used to spin the color wheel)
     public static final int spinner_CentralMotor = 30;

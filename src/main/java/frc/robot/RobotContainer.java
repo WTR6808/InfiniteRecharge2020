@@ -15,10 +15,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.DriveToDistance;
 import frc.robot.commands.FullPowerShooter;
 import frc.robot.commands.HopperWorksVariable;
 import frc.robot.commands.IntakeAbilityVariable;
+import frc.robot.commands.Lower;
+import frc.robot.commands.PullRobotUp;
+import frc.robot.commands.Raise;
 import frc.robot.commands.ReverseHopper;
 import frc.robot.commands.ReverseIntake;
 import frc.robot.commands.TakeSnapShots;
@@ -27,6 +31,7 @@ import frc.robot.commands.VisionDriveToTarget;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.PullToLight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.AutoTurn_AndShoot;
@@ -57,7 +62,8 @@ public class RobotContainer {
   private final Hopper hopperMotor = new Hopper();
   private final Shooter shooterMotor = new Shooter();
   private final Intake intakeMotor = new Intake();
-
+  private final PullToLight liftMotor = new PullToLight();
+ 
   private SendableChooser <Command> m_Chooser = new SendableChooser<Command>();
   //private Command m_autoCommand = new Autonomous1(m_DriveTrain);//new ExampleCommand(m_exampleSubsystem);
 
@@ -121,6 +127,9 @@ public class RobotContainer {
     final JoystickButton driver_Start        = new JoystickButton(m_Driver,  8);
     final JoystickButton driver_L3           = new JoystickButton(m_Driver,  9);
     final JoystickButton driver_R3           = new JoystickButton(m_Driver, 10);
+    final POVButton POV_Button_1             = new POVButton(m_Driver, 0);
+    final POVButton POV_Button_2             = new POVButton(m_Driver, 180);
+
 
     //Driver's Helper Button Definitiions
   /*
@@ -140,7 +149,7 @@ public class RobotContainer {
     driver_Y.whenPressed(new FullPowerShooter(1.0,shooterMotor));                 //Toggle Shooter Wheels On/Off
     driver_X.whenPressed(new ChangeFront(m_DriveTrain));                          //Reverses the Front of the Robot (Intake is normally the Front)
     driver_A.whenPressed(new Darkness(m_DriveTrain));                             //Toggle the Limelight between Driver and Vision Tracking modes
-    driver_B.whenPressed(new TakeSnapShots(m_DriveTrain).withTimeout(2));         //Cause Limelight to Take Snapshots of the Target for 2 seconds
+    driver_B.whileHeld(new PullRobotUp(liftMotor));                               //Raise the robot with the Winch Motor
 
     //Right Trigger default Command for Intake                                    //Right Trigger is Forward Control of Intake Motor
     driver_RightBumper.whileHeld(new ReverseIntake(intakeMotor));                 //Reverse the Intake Motor to UnJam Balls
@@ -152,6 +161,8 @@ public class RobotContainer {
 
     driver_L3.whenPressed(new DriveToDistance(0.65, 1.0, m_DriveTrain));          //Drive Forward at 65% speed for 1 meter.  For Testing, Remove for Competition.
     driver_R3.whenPressed(new TurningAngle(90.0, m_DriveTrain));                  //Turn 90 degrees clockwise.  For Testing, Remove for Competition.
+    POV_Button_1.whileHeld(new Raise(liftMotor));                                 //Lifts the Hook Arm
+    POV_Button_2.whileHeld(new Lower(liftMotor));                                 //Lowers the Hook Arm
   }
 
   /**
